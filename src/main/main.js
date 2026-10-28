@@ -201,7 +201,10 @@ function createOverlay() {
     maximizable: false,
     fullscreenable: false,
     skipTaskbar: true,
-    focusable: false,
+    // Linux: a window made focusable later never gets the keyboard under GNOME (her chat couldn't be
+    // typed in), so it can be from the start. It only takes the pointer on her (shape.js), and is
+    // shown without focus: nothing gets taken from you until you click into her chat.
+    focusable: process.platform === 'linux',
     hasShadow: false,
     alwaysOnTop: true,
     type: process.platform === 'win32' ? 'toolbar' : undefined,
@@ -881,7 +884,7 @@ function registerIpc() {
   // typing to her: the overlay takes the keyboard while the chat is open, and gives it back after
   ipcMain.on('overlay:focus', (_e, on) => {
     if (!overlay) return;
-    overlay.setFocusable(Boolean(on));
+    if (process.platform !== 'linux') overlay.setFocusable(Boolean(on));
     if (on) overlay.focus();
     else overlay.blur();
   });

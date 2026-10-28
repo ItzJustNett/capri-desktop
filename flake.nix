@@ -4,7 +4,7 @@
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
   outputs =
-    { self, nixpkgs }:
+    { nixpkgs, ... }:
     let
       systems = [
         "x86_64-linux"
@@ -28,7 +28,9 @@
       nixosModules.default =
         { pkgs, ... }:
         let
-          capri = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
+          # built with the system's own nixpkgs: its licence is non-commercial (unfree to Nix), and
+          # the system is where allowUnfree is set
+          capri = pkgs.callPackage ./nix/package.nix { };
         in
         {
           environment.systemPackages = [ capri ];
