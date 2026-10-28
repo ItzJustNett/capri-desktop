@@ -207,7 +207,9 @@ function createOverlay() {
     focusable: process.platform === 'linux',
     hasShadow: false,
     alwaysOnTop: true,
-    type: process.platform === 'win32' ? 'toolbar' : undefined,
+    // Linux: a dock to GNOME, the way panels are: on every workspace, never in the overview or
+    // Alt+Tab (skipTaskbar alone isn't heard there)
+    type: { win32: 'toolbar', linux: 'dock' }[process.platform],
     show: false,
     webPreferences: {
       preload: path.join(__dirname, '..', 'preload.js'),
@@ -222,6 +224,7 @@ function createOverlay() {
   overlay.setAlwaysOnTop(true, 'screen-saver');
   overlay.setIgnoreMouseEvents(true, { forward: true });
   shape = startShape(overlay);
+  if (process.platform === 'linux') overlay.setVisibleOnAllWorkspaces(true); // she comes along when you switch
   overlay.loadURL('capri://app/src/renderer/index.html');
   // always shown: put away, she's still there as her biochip in the corner. Sized again first:
   // Windows keeps a new window inside the work area, and resting on the taskbar it covers it too.
